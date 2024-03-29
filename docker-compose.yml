@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  nodejs:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - ./api:/api
+    image: "nodejs"
+    container_name: api-inventory
+  gui:
+    build:
+      context: .
+      dockerfile: ./gui/Dockerfile
+    ports:
+      - 5173:5173
+    volumes:
+      - ./gui:/gui
+    image: "nodejs-gui"
+    container_name: gui-inventory
