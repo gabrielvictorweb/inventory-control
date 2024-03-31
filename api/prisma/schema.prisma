@@ -14,32 +14,37 @@ datasource db {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
-  name      String
-  password  String
-  purchase  Purchase[]
-  type      TypeUser   @relation(fields: [typeId], references: [id])
-  typeId    Int
+  id       Int        @id @default(autoincrement())
+  email    String     @unique
+  name     String
+  password String
+  purchase Purchase[]
+  type     TypeUser   @relation(fields: [typeId], references: [id])
+  typeId   Int
 }
 
 model TypeUser {
-  id        Int     @id @default(autoincrement())
-  name      String
-  user      User[]
+  id   Int    @id @default(autoincrement())
+  name String
+  user User[]
 }
 
 model Products {
-  id      Int     @id @default(autoincrement())
-  name    String
-  image   String
-  price   String
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String
+  image       String
+  price       String
+  stock       Int
+  Purchase    Purchase[]
 }
 
 model Purchase {
-  id        Int     @id @default(autoincrement())
-  name      String
-  price     String
-  author    User    @relation(fields: [authorId], references: [id])
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
+  product   Products @relation(fields: [productId], references: [id])
+  productId Int
+  price     String
 }
