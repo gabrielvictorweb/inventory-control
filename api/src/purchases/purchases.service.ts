@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Purchase } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePurchaseDto } from './dtos/CreatePurchaseDto';
@@ -18,23 +18,26 @@ export class PurchasesService {
         if (!product) {
             throw new NotFoundException('Not found product.');
         } else if (product && product.stock === 0) {
-            throw new NotFoundException('Not found product.');
+            throw new BadRequestException('Product out of stock.');
+        } else if (product && product.stock < createPurchaseDto.quantity) {
+            throw new BadRequestException('Insufficient quantity.');
         }
 
-        // creating purchase
+        // creating purchase and update stock after purchase
         const purchase = {
             productId: product.id,
             quantity: createPurchaseDto.quantity,
             authorId: idUser,
             price: (Number(product.price) * createPurchaseDto.quantity).toString()
         }
-        await this.prisma.purchase.create({ data: purchase });
 
-        // update stock after purchase
-        return this.prisma.products.update({
-            where: { id: createPurchaseDto.idProduct }, data: {
-                stock: product.stock - createPurchaseDto.quantity,
-            },
-        });
+        return this.prisma.$transaction([
+            this.prisma.purchase.create({ data: purchase }),
+            this.prisma.products.update({
+                where: { id: createPurchaseDto.idProduct }, data: {
+                    stock: product.stock - createPurchaseDto.quantity,
+                },
+            })
+        ]);
     }
 }
