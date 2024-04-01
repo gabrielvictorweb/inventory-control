@@ -23,12 +23,14 @@ async function main() {
     }
 };
 
-const ProductSeeder = () => {
-    main()
-        .catch((e) => console.error(e))
-        .finally(async () => {
-            await prisma.$disconnect();
-        });
+const ProductSeeder = async () => {
+    try {
+        await main();
+    } catch (e) {
+        console.error(e)
+    } finally {
+        await prisma.$disconnect();
+    }
 }
 
 export default ProductSeeder;

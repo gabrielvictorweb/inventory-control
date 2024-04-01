@@ -1,6 +1,13 @@
 import ProductSeeder from "./products";
+import StatusPurchaseSeeder from "./statusPurchase";
+import TypeUserSeeder from "./typeUser";
 import UsersSeeder from "./users";
 
-ProductSeeder();
+const execSeeders = async () => {
+    await StatusPurchaseSeeder();
+    await TypeUserSeeder();
+    await ProductSeeder();
+    await UsersSeeder();
+}
 
-UsersSeeder();
+execSeeders();
