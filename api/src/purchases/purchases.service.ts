@@ -1,8 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Purchase } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePurchaseDto } from './dtos/CreatePurchaseDto';
-import { create } from 'domain';
+import { statusPurchase } from 'src/statusPurchase/role.enum';
 
 @Injectable()
 export class PurchasesService {
@@ -24,11 +24,13 @@ export class PurchasesService {
         }
 
         // creating purchase and update stock after purchase
+        const amount = (Number(product.price) * createPurchaseDto.quantity).toString();
         const purchase = {
             productId: product.id,
             quantity: createPurchaseDto.quantity,
             authorId: idUser,
-            price: (Number(product.price) * createPurchaseDto.quantity).toString()
+            price: amount,
+            statusPurchaseId: statusPurchase.Processing
         }
 
         return this.prisma.$transaction([
@@ -36,6 +38,29 @@ export class PurchasesService {
             this.prisma.products.update({
                 where: { id: createPurchaseDto.idProduct }, data: {
                     stock: product.stock - createPurchaseDto.quantity,
+                },
+            })
+        ]);
+    }
+
+    async delete(id: number, userId: number): Promise<unknown> {
+        // find purchase
+        const purchase = await this.prisma.purchase.findUnique({ where: { id } });
+        if (!purchase) {
+            throw new NotFoundException('Not found product.');
+        } else if (purchase.authorId !== userId) {
+            throw new UnauthorizedException('User is not the owner of the order.');
+        }
+
+        return this.prisma.$transaction([
+            this.prisma.products.update({
+                where: { id: purchase.productId }, data: {
+                    stock: { increment: purchase.quantity },
+                },
+            }),
+            this.prisma.purchase.update({
+                where: { id }, data: {
+                    statusPurchaseId: statusPurchase.Canceled,
                 },
             })
         ]);
