@@ -40,11 +40,19 @@ model Products {
 }
 
 model Purchase {
-  id        Int      @id @default(autoincrement())
-  quantity  Int
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  product   Products @relation(fields: [productId], references: [id])
-  productId Int
-  price     String
+  id               Int             @id @default(autoincrement())
+  quantity         Int
+  author           User            @relation(fields: [authorId], references: [id])
+  authorId         Int
+  product          Products        @relation(fields: [productId], references: [id])
+  productId        Int
+  price            String
+  StatusPurchase   StatusPurchase? @relation(fields: [statusPurchaseId], references: [id])
+  statusPurchaseId Int?
+}
+
+model StatusPurchase {
+  id       Int        @id @default(autoincrement())
+  name     String
+  purchase Purchase[]
 }
