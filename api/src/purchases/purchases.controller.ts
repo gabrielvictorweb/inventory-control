@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { PurchasesService } from './purchases.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreatePurchaseDto } from './dtos/CreatePurchaseDto';
@@ -23,5 +23,13 @@ export class PurchasesController {
     @Post()
     save(@Request() req, @Body() createPurchaseDto: CreatePurchaseDto) {
         return this.purchasesService.save(createPurchaseDto, req.user.id);
+    }
+
+    @Roles(Role.Customer)
+    @UseGuards(AuthGuard, RolesGuard)
+    @HttpCode(HttpStatus.OK)
+    @Delete(':id')
+    delete(@Request() req, @Param('id') id) {
+        return this.purchasesService.delete(id, req.user.id);
     }
 }   
