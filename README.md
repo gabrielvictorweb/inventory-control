@@ -16,7 +16,7 @@ $ docker-compose up
 
 ## Usuários
 
-email: admin@local.com - senha: 123456
+email: admin@local.com - senha: 123456 |
 email: customer@local.com - senha: 123456
 
 ## API DOC
