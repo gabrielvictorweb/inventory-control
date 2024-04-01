@@ -8,8 +8,16 @@ import { UpdateProductsDto } from './dtos/UpdateProductsDto';
 export class ProductsService {
     constructor(private prisma: PrismaService) { }
 
-    async findAll(): Promise<Products[] | undefined> {
-        return this.prisma.products.findMany();
+    async findAll(page: string = '0', perPage: string = '10'): Promise<{ products: Products[], total: number, page: number, perPage: number }> {
+        const [products, total] = await this.prisma.$transaction([
+            this.prisma.products.findMany({
+                skip: Number(perPage) * Number(page),
+                take: Number(perPage),
+            }),
+            this.prisma.products.count()
+        ]);
+
+        return { products, total, page: Number(page), perPage: Number(perPage) };
     }
 
     async findOne(id: number): Promise<Products> {

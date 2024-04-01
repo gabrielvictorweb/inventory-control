@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductsDto } from './dtos/CreateProductsDto';
 import { Roles } from 'src/roles/roles';
@@ -6,6 +6,7 @@ import { Role } from 'src/roles/role.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/roles/role.guard';
 import { UpdateProductsDto } from './dtos/UpdateProductsDto';
+import { ListProductsDto } from './dtos/ListProductsDto';
 
 @Controller('products')
 export class ProductsController {
@@ -13,14 +14,14 @@ export class ProductsController {
 
     @HttpCode(HttpStatus.OK)
     @Get()
-    findAll() {
-        return this.productsService.findAll();
+    findAll(@Query() listProductsDto: ListProductsDto) {
+        return this.productsService.findAll(listProductsDto.page, listProductsDto.perPage);
     }
 
     @HttpCode(HttpStatus.OK)
     @Get(':id')
     findOne(@Param('id') id) {
-        return this.productsService.findOne(id);
+        return this.productsService.findOne(+id);
     }
 
     @Roles(Role.Admin)

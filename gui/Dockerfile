@@ -1,10 +1,10 @@
-FROM node:20-alpine
+FROM node:20.10-alpine
 
-WORKDIR /api 
+WORKDIR /gui 
 
 LABEL maintainer="Gabriel Victor <gabrielvictorweb@gmail.com>"
 
-LABEL description="This example Dockerfile installs node"
+LABEL description="This Dockerfile installs node"
 
 COPY ./gui .
 

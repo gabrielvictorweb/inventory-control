@@ -9,7 +9,11 @@ export class PurchasesService {
     constructor(private prisma: PrismaService) { }
 
     async findAll(): Promise<Purchase[] | undefined> {
-        return this.prisma.purchase.findMany();
+        return this.prisma.purchase.findMany({
+            include: {
+                product: true,
+            },
+        });
     }
 
     async save(createPurchaseDto: CreatePurchaseDto, idUser: number): Promise<unknown> {

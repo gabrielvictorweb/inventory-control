@@ -1,6 +1,6 @@
-import { PrismaClient, User } from '@prisma/client';
-import * as faker from 'faker';
-import * as bcrypt from 'bcrypt';
+import { PrismaClient } from '@prisma/client';
+import { fakerPT_BR as faker } from '@faker-js/faker';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -8,8 +8,8 @@ const saltOrRounds = 10;
 const passwordDefault = '123456';
 
 const fakerCustomer = () => ({
-    name: faker.name.firstName() + faker.name.lastName(),
-    email: faker.internet.email(),
+    name: faker.person.firstName() + faker.person.lastName(),
+    email: 'customer@local.com',
     typeId: 2
 });
 
@@ -27,14 +27,11 @@ async function main() {
         return;
     }
 
-    const hash = await bcrypt.hash(passwordDefault, saltOrRounds);
+    var hash = await bcrypt.hashSync(passwordDefault, saltOrRounds);
     await prisma.user.create({ data: { ...fakerAdmin(), password: hash } });
 
-    const fakerRounds = 3;
-    for (let i = 0; i < fakerRounds; i++) {
-        const hash = await bcrypt.hash(passwordDefault, saltOrRounds);
-        await prisma.user.create({ data: { ...fakerCustomer(), password: hash } });
-    }
+    hash = await bcrypt.hashSync(passwordDefault, saltOrRounds);
+    await prisma.user.create({ data: { ...fakerCustomer(), password: hash } });
 };
 
 const UsersSeeder = async () => {
